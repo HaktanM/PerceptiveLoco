@@ -111,6 +111,9 @@
   p{ margin:0 0 1.1rem; }
   p:last-child{ margin-bottom:0; }
 
+  /* narrow text block sitting directly above a figure group */
+  .lead-in{ margin-bottom:clamp(2rem,4vw,2.75rem); }
+
   /* ---------- video ---------- */
   .video-frame{
     background:var(--card);
@@ -236,34 +239,64 @@
     </div>
   </section>
 
-  <!-- ================= ABSTRACT ================= -->
-  <section>
-    <div class="text">
-      <h2>Abstract</h2>
+  <!-- ================= 1. INTRODUCTION + WORLD MODEL ================= -->
+  <section id="introduction">
+    <div class="text lead-in">
+      <h2>Introduction</h2>
       <p>
-        <!-- paste the real abstract here -->
-        Placeholder. Two or three sentences on the problem, then what the method
-        does differently, then the headline result. Keep it to a single
-        paragraph — this is the only block most visitors will read before
-        deciding whether to scroll.
+        <!-- replace: the problem -->
+        Placeholder. Open with the problem — a legged robot has to cross terrain
+        it can see but has never touched, and the gap between what a simulator
+        renders and what a real camera returns is where most policies break down.
       </p>
+      <p>
+        <!-- replace: the idea, in one or two sentences -->
+        Placeholder. At the centre of the method is a learned world model that
+        compresses image and proprioceptive observations into a recurrent latent
+        state, giving the policy a compact predictive summary of the terrain
+        instead of raw pixels.
+      </p>
+    </div>
+
+    <div class="wide">
+      <figure>
+        <img src="figures/world_model_figure.png"
+             alt="Recurrent state-space model unrolled over three timesteps, showing recurrent states, posterior and prior latents, KL terms, and image and proprioception reconstruction.">
+        <figcaption>
+          <b>Figure 1. World model.</b> A recurrent state-space model carries
+          <i>h<sub>t</sub></i> forward under actions. The posterior
+          <i>z<sub>t</sub></i> is encoded from the image and proprioceptive
+          observation, while the prior <i>ẑ<sub>t</sub></i> is imagined from
+          <i>h<sub>t</sub></i> alone; a KL term draws the two together. Solid
+          arrows are inference, dashed arrows generation.
+        </figcaption>
+      </figure>
     </div>
   </section>
 
-  <!-- ================= METHOD FIGURES ================= -->
-  <section>
-    <div class="wide">
-      <h2>Method</h2>
+  <!-- ================= 2. SYSTEM ================= -->
+  <section id="system">
+    <div class="text lead-in">
+      <h2>System</h2>
+      <p>
+        <!-- replace: how the world model sits inside the training system -->
+        Placeholder. Explain how the model above is embedded in the training
+        loop — where its data comes from, what consumes its output, and why
+        training alternates between the two objectives rather than optimising
+        them jointly.
+      </p>
+    </div>
 
+    <div class="wide">
       <figure>
         <img src="figures/training_pipeline_figure.png"
              alt="System diagram: offline data collection and a simulation buffer both feed a world model, which supplies recurrent state to a policy acting in simulation.">
         <figcaption>
-          <b>Figure 1. Training pipeline.</b> Transitions from offline real-world
-          data collection and from simulation are both used to train the world
-          model. The world model passes its recurrent state to the policy, which
-          acts in simulation; the resulting transitions return to the simulation
-          buffer, closing the loop.
+          <b>Figure 2. Training pipeline.</b> Transitions from offline real-world
+          data collection and from simulation both train the world model. The
+          world model passes its recurrent state to the policy, which acts in
+          simulation; the resulting transitions return to the simulation buffer,
+          closing the loop.
         </figcaption>
       </figure>
 
@@ -271,37 +304,24 @@
         <img src="figures/training_stages_figure.png"
              alt="The same pipeline shown twice, with dashed outlines marking which components are active during policy training and during world-model training.">
         <figcaption>
-          <b>Figure 2. Alternating training stages.</b> Training alternates
-          between <i>N</i> steps of policy optimization against the simulation,
+          <b>Figure 3. Alternating training stages.</b> Training alternates
+          between <i>N</i> steps of policy optimisation against the simulation,
           with the world model supplying state, and <i>M</i> steps of world-model
           training on offline and simulated transitions. Dashed outlines mark the
           components active in each stage.
-        </figcaption>
-      </figure>
-
-      <figure>
-        <img src="figures/world_model_figure.png"
-             alt="Recurrent state-space model unrolled over three timesteps, showing recurrent states, posterior and prior latents, KL terms, and image and proprioception reconstruction.">
-        <figcaption>
-          <b>Figure 3. World model.</b> A recurrent state-space model carries
-          <i>h<sub>t</sub></i> forward under actions. The posterior
-          <i>z<sub>t</sub></i> is encoded from the image and proprioceptive
-          observation, while the prior <i>ẑ<sub>t</sub></i> is imagined from
-          <i>h<sub>t</sub></i> alone; a KL term draws them together. Solid arrows
-          are inference, dashed arrows generation.
         </figcaption>
       </figure>
     </div>
   </section>
 
   <!-- ================= RESULTS — delete if not ready ================= -->
-  <section>
+  <section id="results">
     <div class="text">
       <h2>Results</h2>
       <p>
-        Placeholder. One paragraph, or a results figure moved up into the wide
-        container above. Delete this section entirely if there's nothing to show
-        yet — an empty heading reads worse than no heading.
+        Placeholder. One paragraph, or a results figure moved into a wide
+        container like the ones above. Delete this section entirely if there's
+        nothing to show yet — an empty heading reads worse than no heading.
       </p>
     </div>
   </section>
