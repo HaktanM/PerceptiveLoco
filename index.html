@@ -4,527 +4,326 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- ============================================================
-     REPLACE: page title + description (shows in search + link previews)
-     ============================================================ -->
-<title>Beacon — tail and filter JSON logs in your terminal</title>
-<meta name="description" content="A small command-line tool that turns structured JSON logs into something you can actually read.">
+<title>PerceptiveLoco</title>
+<meta name="description" content="Project page for PerceptiveLoco.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --paper:      #e8eae3;
-    --paper-lift: #f2f3ee;
-    --ink:        #15201c;
-    --ink-soft:   #4a554e;
-    --rule:       #ccd1c5;
-    --blue:       #1d4ed8;
-    --blue-deep:  #16309b;
+    --paper:     #f8f8f6;
+    --card:      #ffffff;
+    --ink:       #182229;
+    --ink-soft:  #5a6670;
+    --rule:      #dcdcd6;
+    --accent:    #1f4e79;
+    --accent-lt: #2e6da4;
 
-    --term-bg:    #16211d;
-    --term-fg:    #dde3da;
-    --term-dim:   #7d8b82;
-    --term-str:   #8fd3b0;
-    --term-num:   #e3c567;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans:  "Source Sans 3", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-
-    --gutter: clamp(1.25rem, 5vw, 4rem);
-    --wrap: 68rem;
+    --gutter: clamp(1.25rem, 5vw, 3rem);
+    --text-w: 42rem;   /* ~72 characters */
+    --wide-w: 62rem;   /* figures */
   }
 
   *,*::before,*::after{ box-sizing:border-box; }
-
-  html{ -webkit-text-size-adjust:100%; }
 
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:var(--sans);
-    font-size:clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
-    line-height:1.6;
+    font-family:var(--serif);
+    font-size:1.0625rem;
+    line-height:1.7;
     -webkit-font-smoothing:antialiased;
   }
 
-  a{ color:var(--blue-deep); text-decoration-thickness:1px; text-underline-offset:3px; }
-  a:hover{ color:var(--blue); }
+  a{ color:var(--accent); text-underline-offset:2px; }
+  a:hover{ color:var(--accent-lt); }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
 
-  :focus-visible{
-    outline:2px solid var(--blue);
-    outline-offset:3px;
-    border-radius:2px;
-  }
+  .text{ max-width:var(--text-w); margin-inline:auto; padding-inline:var(--gutter); }
+  .wide{ max-width:var(--wide-w); margin-inline:auto; padding-inline:var(--gutter); }
 
-  .wrap{
-    max-width:var(--wrap);
-    margin-inline:auto;
-    padding-inline:var(--gutter);
-  }
-
-  /* ---------- header ---------- */
-  .masthead{
+  /* ---------- title block ---------- */
+  header{
+    text-align:center;
+    padding-block:clamp(3rem,8vw,5.5rem) clamp(2rem,4vw,3rem);
     border-bottom:1px solid var(--rule);
   }
-  .masthead .wrap{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
-    min-height:4.25rem;
-  }
-  .wordmark{
-    font-weight:700;
-    font-size:1.0625rem;
-    letter-spacing:-0.015em;
-    color:var(--ink);
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:0.55rem;
-  }
-  .wordmark::before{
-    content:"";
-    width:0.6rem; height:0.6rem;
-    background:var(--blue);
-    border-radius:50%;
-    flex:none;
-  }
-  .masthead nav{
-    display:flex;
-    gap:clamp(1rem,3vw,1.75rem);
-    font-size:0.9375rem;
-  }
-  .masthead nav a{
-    color:var(--ink-soft);
-    text-decoration:none;
-  }
-  .masthead nav a:hover{ color:var(--blue); text-decoration:underline; }
-
-  /* ---------- hero ---------- */
-  .hero{ padding-block:clamp(2.75rem, 7vw, 5.5rem) clamp(2.5rem, 6vw, 4.5rem); }
-  .hero .wrap{
-    display:grid;
-    gap:clamp(2.25rem, 5vw, 3.5rem);
-    grid-template-columns:1fr;
-    align-items:start;
-  }
-  @media (min-width:62rem){
-    .hero .wrap{ grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:4rem; }
-  }
-
   h1{
-    margin:0 0 1rem;
-    font-size:clamp(2.25rem, 1.4rem + 3.6vw, 3.5rem);
-    line-height:1.04;
-    letter-spacing:-0.032em;
+    margin:0 0 0.75rem;
+    font-size:clamp(2.25rem,1.5rem + 3vw,3.25rem);
+    line-height:1.1;
+    letter-spacing:-0.02em;
     font-weight:700;
-    max-width:16ch;
-    text-wrap:balance;
   }
-  .lede{
-    margin:0 0 2rem;
-    font-size:clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-    line-height:1.55;
+  .subtitle{
+    margin:0 auto 1.75rem;
+    max-width:34rem;
+    font-size:clamp(1.0625rem,1rem + 0.4vw,1.25rem);
+    line-height:1.45;
     color:var(--ink-soft);
-    max-width:44ch;
   }
-
-  /* install strip */
-  .install{
-    display:flex;
-    align-items:stretch;
-    border:1px solid var(--ink);
-    border-radius:5px;
-    background:var(--paper-lift);
-    overflow:hidden;
-    max-width:26rem;
-  }
-  .install code{
-    font-family:var(--mono);
-    font-size:0.9375rem;
-    padding:0.7rem 0.9rem;
-    flex:1;
-    min-width:0;
-    overflow-x:auto;
-    white-space:nowrap;
-    display:flex;
-    align-items:center;
-    gap:0.5rem;
-  }
-  .install code .prompt{ color:var(--blue); user-select:none; }
-  .copy{
-    font:inherit;
-    font-size:0.875rem;
-    font-weight:500;
+  .authors{
     font-family:var(--sans);
-    border:0;
-    border-left:1px solid var(--ink);
-    background:var(--ink);
-    color:var(--paper-lift);
-    padding-inline:1rem;
-    cursor:pointer;
-    flex:none;
+    font-size:1rem;
+    margin:0 0 0.25rem;
   }
-  .copy:hover{ background:var(--blue-deep); }
-  .copy[data-done="true"]{ background:var(--blue); }
+  .affil{
+    font-family:var(--sans);
+    font-size:0.9375rem;
+    color:var(--ink-soft);
+    margin:0 0 2rem;
+  }
 
-  .hero-links{
-    margin-top:1.5rem;
+  .buttons{
     display:flex;
     flex-wrap:wrap;
-    align-items:center;
-    gap:1.25rem;
+    justify-content:center;
+    gap:0.625rem;
+  }
+  .buttons a{
+    font-family:var(--sans);
     font-size:0.9375rem;
-    color:var(--ink-soft);
+    font-weight:500;
+    text-decoration:none;
+    color:var(--paper);
+    background:var(--ink);
+    padding:0.5rem 1.1rem;
+    border-radius:100px;
   }
-  .hero-links a{ font-weight:500; }
+  .buttons a:hover{ background:var(--accent); color:#fff; }
 
-  /* ---------- terminal ---------- */
-  .terminal{
-    background:var(--term-bg);
-    color:var(--term-fg);
-    border-radius:7px;
-    font-family:var(--mono);
-    font-size:0.8125rem;
-    line-height:1.85;
-    overflow:hidden;
-    box-shadow:0 1px 0 var(--rule);
-  }
-  .terminal-bar{
-    display:flex;
-    align-items:center;
-    gap:0.5rem;
-    padding:0.6rem 0.9rem;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-    color:var(--term-dim);
-    font-size:0.75rem;
-  }
-  .terminal-bar span{
-    width:0.5rem; height:0.5rem; border-radius:50%;
-    background:rgba(255,255,255,0.18);
-  }
-  .terminal-bar b{ font-weight:400; margin-left:0.35rem; }
-  .terminal-body{
-    padding:0.9rem 0.4rem 1.1rem 0.9rem;
-    overflow-x:auto;
-  }
-  .terminal-body pre{
-    margin:0;
-    font:inherit;
-    white-space:pre;
-  }
-  .terminal .line{ display:block; }
-  .terminal .c-dim{ color:var(--term-dim); }
-  .terminal .c-blue{ color:#8ab4ff; }
-  .terminal .c-str{ color:var(--term-str); }
-  .terminal .c-num{ color:var(--term-num); }
+  /* ---------- sections ---------- */
+  section{ padding-block:clamp(2.5rem,5vw,3.75rem); }
+  section + section{ border-top:1px solid var(--rule); }
 
-  /* one page-load reveal, and only one */
-  .terminal .line{ opacity:0; animation:appear .28s ease forwards; }
-  .terminal .line:nth-child(1){ animation-delay:.10s }
-  .terminal .line:nth-child(2){ animation-delay:.22s }
-  .terminal .line:nth-child(3){ animation-delay:.30s }
-  .terminal .line:nth-child(4){ animation-delay:.38s }
-  .terminal .line:nth-child(5){ animation-delay:.46s }
-  .terminal .line:nth-child(6){ animation-delay:.54s }
-  .terminal .line:nth-child(7){ animation-delay:.62s }
-  .terminal .line:nth-child(8){ animation-delay:.70s }
-  @keyframes appear{ from{opacity:0} to{opacity:1} }
-
-  @media (prefers-reduced-motion: reduce){
-    .terminal .line{ opacity:1; animation:none; }
-    *{ transition-duration:0.01ms !important; }
-  }
-
-  /* ---------- capabilities ---------- */
-  .capabilities{
-    border-top:1px solid var(--rule);
-    border-bottom:1px solid var(--rule);
-    padding-block:clamp(2.5rem,5vw,3.5rem);
-  }
-  .capabilities .grid{
-    display:grid;
-    gap:2rem;
-    grid-template-columns:1fr;
-  }
-  @media (min-width:48rem){
-    .capabilities .grid{
-      grid-template-columns:repeat(3,1fr);
-      gap:0;
-    }
-    .capabilities .item{
-      padding-inline:2rem;
-      border-left:1px solid var(--rule);
-    }
-    .capabilities .item:first-child{ padding-left:0; border-left:0; }
-    .capabilities .item:last-child{ padding-right:0; }
-  }
-  .capabilities h2{
-    margin:0 0 1.75rem;
-    font-size:1rem;
-    font-weight:600;
-    letter-spacing:-0.01em;
-  }
-  .item h3{
-    margin:0 0 0.4rem;
-    font-size:1.0625rem;
-    font-weight:600;
+  h2{
+    font-size:1.5rem;
     letter-spacing:-0.015em;
+    font-weight:600;
+    margin:0 0 1.25rem;
   }
-  .item p{
-    margin:0;
-    color:var(--ink-soft);
-    font-size:0.9375rem;
-    max-width:38ch;
-  }
+  p{ margin:0 0 1.1rem; }
+  p:last-child{ margin-bottom:0; }
 
-  /* ---------- quick start (a real sequence, so numbered) ---------- */
-  .start{ padding-block:clamp(2.75rem,6vw,4.5rem); }
-  .start h2{
-    margin:0 0 2rem;
-    font-size:clamp(1.5rem,1.2rem + 1vw,1.875rem);
-    letter-spacing:-0.025em;
-    font-weight:700;
-  }
-  ol.steps{
-    list-style:none;
-    counter-reset:step;
-    margin:0;
-    padding:0;
-    display:grid;
-    gap:1.75rem;
-    max-width:44rem;
-  }
-  ol.steps li{
-    counter-increment:step;
-    display:grid;
-    grid-template-columns:1.75rem 1fr;
-    gap:0 0.9rem;
-    align-items:baseline;
-  }
-  ol.steps li::before{
-    content:counter(step);
-    font-family:var(--mono);
-    font-size:0.8125rem;
-    color:var(--blue);
+  /* ---------- video ---------- */
+  .video-frame{
+    background:var(--card);
     border:1px solid var(--rule);
-    border-radius:50%;
-    width:1.75rem; height:1.75rem;
-    display:grid; place-items:center;
-    align-self:start;
-    background:var(--paper-lift);
+    border-radius:6px;
+    overflow:hidden;
   }
-  ol.steps p{ margin:0 0 0.65rem; }
-  ol.steps pre{
-    grid-column:2;
-    margin:0;
-    background:var(--term-bg);
-    color:var(--term-fg);
-    font-family:var(--mono);
-    font-size:0.8125rem;
-    line-height:1.7;
-    padding:0.85rem 1rem;
-    border-radius:5px;
-    overflow-x:auto;
+  .video-frame video{
+    display:block;
+    width:100%;
+    height:auto;
+    background:#111;
   }
-  ol.steps .c-dim{ color:var(--term-dim); }
-  ol.steps .c-str{ color:var(--term-str); }
-
-  .start .after{
-    margin-top:2.5rem;
-    max-width:44rem;
+  .video-placeholder{
+    aspect-ratio:16/9;
+    display:grid;
+    place-items:center;
+    text-align:center;
     color:var(--ink-soft);
+    font-family:var(--sans);
     font-size:0.9375rem;
+    padding:1.5rem;
+    background:
+      repeating-linear-gradient(45deg,
+        #f1f1ee 0 12px, #ebebe7 12px 24px);
   }
 
-  /* ---------- footer ---------- */
+  /* ---------- figures ---------- */
+  figure{
+    margin:0 0 clamp(2.25rem,4vw,3rem);
+  }
+  figure:last-of-type{ margin-bottom:0; }
+  figure img{
+    display:block;
+    width:100%;
+    height:auto;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+  }
+  figcaption{
+    font-family:var(--sans);
+    font-size:0.9375rem;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin-top:0.75rem;
+    max-width:46rem;
+  }
+  figcaption b{
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  /* ---------- bibtex ---------- */
+  pre{
+    margin:0;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:1rem 1.15rem;
+    overflow-x:auto;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:0.8125rem;
+    line-height:1.65;
+    color:var(--ink);
+  }
+
   footer{
     border-top:1px solid var(--rule);
     padding-block:2rem 3rem;
+    font-family:var(--sans);
     font-size:0.875rem;
     color:var(--ink-soft);
-  }
-  footer .wrap{
-    display:flex;
-    flex-wrap:wrap;
-    gap:0.5rem 1.5rem;
-    justify-content:space-between;
-  }
-  footer ul{
-    display:flex; flex-wrap:wrap; gap:1.25rem;
-    list-style:none; margin:0; padding:0;
+    text-align:center;
   }
 
-  .sr-only{
-    position:absolute; width:1px; height:1px;
-    padding:0; margin:-1px; overflow:hidden;
-    clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
   }
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     REPLACE: project name in .wordmark, and both nav links
-     ============================================================ -->
-<header class="masthead">
-  <div class="wrap">
-    <a class="wordmark" href="/">Beacon</a>
-    <nav aria-label="Primary">
-      <a href="#start">Quick start</a>
-      <a href="https://example.com/docs">Docs</a>
-      <a href="https://github.com/you/beacon">GitHub</a>
-    </nav>
+<!-- ================= TITLE BLOCK — edit names, affiliation, links ================= -->
+<header>
+  <div class="text">
+    <h1>PerceptiveLoco</h1>
+    <p class="subtitle">
+      <!-- one-line description of the paper -->
+      Learning perceptive locomotion with a world model trained jointly on
+      offline real-world data and simulation.
+    </p>
+    <p class="authors">Author One &middot; Author Two &middot; Author Three</p>
+    <p class="affil">Institution &middot; 2026</p>
+
+    <div class="buttons">
+      <a href="#">Paper</a>
+      <a href="#">arXiv</a>
+      <a href="#">Code</a>
+      <a href="#video">Video</a>
+    </div>
   </div>
 </header>
 
 <main>
-  <!-- ============================================================
-       REPLACE: headline, lede, install command, terminal contents
-       ============================================================ -->
-  <section class="hero">
-    <div class="wrap">
-      <div>
-        <h1>Your JSON logs, finally readable.</h1>
-        <p class="lede">
-          Beacon tails a log stream, filters it with plain expressions, and prints
-          each record as something a human can scan. No config file, no daemon,
-          one binary.
-        </p>
 
-        <div class="install">
-          <code id="install-cmd"><span class="prompt" aria-hidden="true">$</span>brew install beacon</code>
-          <button class="copy" data-copy="brew install beacon">Copy</button>
-        </div>
+  <!-- ================= VIDEO ================= -->
+  <section id="video">
+    <div class="wide">
+      <div class="video-frame">
+        <!--
+          When the video is ready, drop it in as videos/overview.mp4 and
+          replace the whole .video-placeholder div below with:
 
-        <p class="hero-links">
-          <a href="https://github.com/you/beacon">Source on GitHub</a>
-          <a href="https://example.com/docs">Read the docs</a>
-          <span>MIT licensed</span>
-        </p>
-      </div>
+          <video controls poster="figures/poster.jpg">
+            <source src="videos/overview.mp4" type="video/mp4">
+          </video>
 
-      <div class="terminal" role="img"
-           aria-label="Terminal showing beacon filtering a log file for errors on the checkout service and printing three readable records.">
-        <div class="terminal-bar" aria-hidden="true">
-          <span></span><span></span><span></span><b>beacon</b>
-        </div>
-        <div class="terminal-body" aria-hidden="true">
-<pre><code><span class="line"><span class="c-blue">$</span> tail -f app.log | beacon --where <span class="c-str">'level = error'</span></span>
-<span class="line"></span>
-<span class="line"><span class="c-dim">14:02:11</span> <span class="c-num">error</span>  checkout   payment gateway timeout</span>
-<span class="line"><span class="c-dim">        </span>        order=<span class="c-str">a91f2</span> retry=<span class="c-num">2</span> took=<span class="c-num">30.1s</span></span>
-<span class="line"></span>
-<span class="line"><span class="c-dim">14:02:19</span> <span class="c-num">error</span>  checkout   payment gateway timeout</span>
-<span class="line"><span class="c-dim">        </span>        order=<span class="c-str">c04b8</span> retry=<span class="c-num">1</span> took=<span class="c-num">30.0s</span></span>
-<span class="line"><span class="c-dim">…</span></span></code></pre>
-        </div>
+          Keep it under ~50 MB — GitHub warns above 50 and blocks at 100.
+        -->
+        <div class="video-placeholder">Video goes here</div>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       REPLACE: the three things your project is actually good at
-       ============================================================ -->
-  <section class="capabilities">
-    <div class="wrap">
-      <h2>What it does</h2>
-      <div class="grid">
-        <div class="item">
-          <h3>Reads any JSON stream</h3>
-          <p>Point it at a file, a pipe, or stdout from a container. Mixed and
-             malformed lines pass through untouched instead of crashing the run.</p>
-        </div>
-        <div class="item">
-          <h3>Filters without a query language</h3>
-          <p>Write <code>level = error and took &gt; 5s</code>. Fields are matched by
-             name, so you don't need to know the shape of the record first.</p>
-        </div>
-        <div class="item">
-          <h3>Stays out of your pipeline</h3>
-          <p>Output is line-oriented and colour-free when it isn't a terminal, so
-             grep, jq, and your CI logs all keep working.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       REPLACE: the three steps to first success with your project
-       ============================================================ -->
-  <section class="start" id="start">
-    <div class="wrap">
-      <h2>Quick start</h2>
-      <ol class="steps">
-        <li>
-          <p>Install it. Binaries are also on the releases page if you'd rather not use Homebrew.</p>
-          <pre><code>brew install beacon</code></pre>
-        </li>
-        <li>
-          <p>Pipe a log file through it to see the default formatting.</p>
-          <pre><code>cat app.log | beacon</code></pre>
-        </li>
-        <li>
-          <p>Narrow it down to what you're chasing.</p>
-          <pre><code>tail -f app.log | beacon --where <span class="c-str">'service = checkout and level = error'</span></code></pre>
-        </li>
-      </ol>
-
-      <p class="after">
-        That's the whole surface area. Everything else — custom field ordering,
-        JSON output, exit codes for CI — is covered in
-        <a href="https://example.com/docs">the docs</a>. Bug reports and pull
-        requests are welcome on <a href="https://github.com/you/beacon">GitHub</a>.
+  <!-- ================= ABSTRACT ================= -->
+  <section>
+    <div class="text">
+      <h2>Abstract</h2>
+      <p>
+        <!-- paste the real abstract here -->
+        Placeholder. Two or three sentences on the problem, then what the method
+        does differently, then the headline result. Keep it to a single
+        paragraph — this is the only block most visitors will read before
+        deciding whether to scroll.
       </p>
     </div>
   </section>
+
+  <!-- ================= METHOD FIGURES ================= -->
+  <section>
+    <div class="wide">
+      <h2>Method</h2>
+
+      <figure>
+        <img src="figures/training_pipeline_figure.png"
+             alt="System diagram: offline data collection and a simulation buffer both feed a world model, which supplies recurrent state to a policy acting in simulation.">
+        <figcaption>
+          <b>Figure 1. Training pipeline.</b> Transitions from offline real-world
+          data collection and from simulation are both used to train the world
+          model. The world model passes its recurrent state to the policy, which
+          acts in simulation; the resulting transitions return to the simulation
+          buffer, closing the loop.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="figures/training_stages_figure.png"
+             alt="The same pipeline shown twice, with dashed outlines marking which components are active during policy training and during world-model training.">
+        <figcaption>
+          <b>Figure 2. Alternating training stages.</b> Training alternates
+          between <i>N</i> steps of policy optimization against the simulation,
+          with the world model supplying state, and <i>M</i> steps of world-model
+          training on offline and simulated transitions. Dashed outlines mark the
+          components active in each stage.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="figures/world_model_figure.png"
+             alt="Recurrent state-space model unrolled over three timesteps, showing recurrent states, posterior and prior latents, KL terms, and image and proprioception reconstruction.">
+        <figcaption>
+          <b>Figure 3. World model.</b> A recurrent state-space model carries
+          <i>h<sub>t</sub></i> forward under actions. The posterior
+          <i>z<sub>t</sub></i> is encoded from the image and proprioceptive
+          observation, while the prior <i>ẑ<sub>t</sub></i> is imagined from
+          <i>h<sub>t</sub></i> alone; a KL term draws them together. Solid arrows
+          are inference, dashed arrows generation.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS — delete if not ready ================= -->
+  <section>
+    <div class="text">
+      <h2>Results</h2>
+      <p>
+        Placeholder. One paragraph, or a results figure moved up into the wide
+        container above. Delete this section entirely if there's nothing to show
+        yet — an empty heading reads worse than no heading.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= CITATION ================= -->
+  <section>
+    <div class="text">
+      <h2>Citation</h2>
+      <pre><code>@article{placeholder2026perceptiveloco,
+  title   = {PerceptiveLoco},
+  author  = {One, Author and Two, Author and Three, Author},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </section>
+
 </main>
 
-<!-- ============================================================
-     REPLACE: footer links and attribution
-     ============================================================ -->
 <footer>
-  <div class="wrap">
-    <p style="margin:0">Beacon is free software under the MIT licence.</p>
-    <ul>
-      <li><a href="https://github.com/you/beacon">GitHub</a></li>
-      <li><a href="https://example.com/docs">Docs</a></li>
-      <li><a href="https://github.com/you/beacon/releases">Releases</a></li>
-    </ul>
-  </div>
+  <div class="text">Page template — replace this line with contact or acknowledgements.</div>
 </footer>
-
-<p class="sr-only" role="status" aria-live="polite" id="copy-status"></p>
-
-<script>
-  document.querySelectorAll(".copy").forEach(function (button) {
-    button.addEventListener("click", async function () {
-      const text = button.dataset.copy;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const field = document.createElement("textarea");
-        field.value = text;
-        document.body.appendChild(field);
-        field.select();
-        document.execCommand("copy");
-        field.remove();
-      }
-      button.textContent = "Copied";
-      button.dataset.done = "true";
-      document.getElementById("copy-status").textContent = "Install command copied.";
-      setTimeout(function () {
-        button.textContent = "Copy";
-        button.dataset.done = "false";
-      }, 2000);
-    });
-  });
-</script>
 
 </body>
 </html>
